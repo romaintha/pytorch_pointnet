@@ -54,7 +54,9 @@ def train_shapenet(dataset_folder,
 
     mb = master_bar(range(epochs))
 
-    os.mkdir(output_folder)
+    if not os.path.isdir(output_folder):
+        os.mkdir(output_folder)
+
     with open(os.path.join(output_folder, 'training_log.csv'), 'w+') as fid:
         fid.write('train_loss,test_loss,train_accuracy,test_accuracy\n')
 
