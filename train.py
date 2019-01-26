@@ -121,7 +121,7 @@ def train_shapenet(dataset_folder,
                     np.mean(epoch_test_loss),
                     np.mean(epoch_train_acc),
                     np.mean(epoch_test_acc)))
-        if np.mean(epoch_test_acc) > np.max(val_acc):
+        if val_acc and np.mean(epoch_test_acc) > np.max(val_acc):
             torch.save(model.state_dict(), os.path.join(output_folder, 'shapenet_%s_model.pth' % task))
 
         with open(os.path.join(output_folder, 'training_log.csv'), 'a') as fid:
