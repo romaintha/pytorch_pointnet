@@ -121,8 +121,7 @@ def train_shapenet(dataset_folder,
                     np.mean(epoch_test_loss),
                     np.mean(epoch_train_acc),
                     np.mean(epoch_test_acc)))
-        if np.mean(epoch_test_acc) > val_acc:
-            val_acc = np.mean(epoch_test_acc)
+        if np.mean(epoch_test_acc) > np.max(val_acc):
             torch.save(model.state_dict(), os.path.join(output_folder, 'shapenet_%s_model.pth' % task))
 
         with open(os.path.join(output_folder, 'training_log.csv'), 'a') as fid:
@@ -162,7 +161,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=20, help='number of epochs')
     parser.add_argument('--learning_rate', type=float, default=0.001, help='learning rate')
     parser.add_argument('--number_of_workers', type=int, default=1, help='number of workers for the dataloader')
-    parser.add_argument('--model', type=str, default='', help='model path')
+    parser.add_argument('--model_checkpoint', type=str, default='', help='model checkpoint path')
 
     args = parser.parse_args()
 
@@ -175,4 +174,4 @@ if __name__ == '__main__':
                        args.learning_rate,
                        args.output_folder,
                        args.number_of_workers,
-                       args.model)
+                       args.model_checkpoint)

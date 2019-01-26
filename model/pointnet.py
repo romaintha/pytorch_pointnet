@@ -37,7 +37,10 @@ class TransformationNet(nn.Module):
         x = F.relu(self.bn_5(self.fc_2(x)))
         x = self.fc_3(x)
 
-        x = x.view(-1, self.output_dim, self.output_dim) + torch.eye(self.output_dim).cuda()
+        identity_matrix = torch.eye(self.output_dim)
+        if torch.cuda.is_available():
+            identity_matrix = identity_matrix.cuda()
+        x = x.view(-1, self.output_dim, self.output_dim) + identity_matrix
         return x
 
 
