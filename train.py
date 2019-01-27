@@ -63,7 +63,7 @@ def train_shapenet(dataset_folder,
     train_loss = []
     test_loss = []
     train_acc = []
-    val_acc = []
+    test_acc = []
     for epoch in mb:
         epoch_train_loss = []
         epoch_train_acc = []
@@ -115,7 +115,7 @@ def train_shapenet(dataset_folder,
                 accuracy = corrects.item() / float(batch_size)
             elif task == 'segmentation':
                 accuracy = corrects.item() / float(batch_size*number_of_points)
-                epoch_test_acc.append(accuracy)
+            epoch_test_acc.append(accuracy)
 
         mb.write('Epoch %s: train loss: %s, val loss: %f, train accuracy: %s,  val accuracy: %f'
                  % (epoch,
@@ -123,7 +123,7 @@ def train_shapenet(dataset_folder,
                     np.mean(epoch_test_loss),
                     np.mean(epoch_train_acc),
                     np.mean(epoch_test_acc)))
-        if val_acc and np.mean(epoch_test_acc) > np.max(val_acc):
+        if test_acc and np.mean(epoch_test_acc) > np.max(test_acc):
             torch.save(model.state_dict(), os.path.join(output_folder, 'shapenet_%s_model.pth' % task))
 
         with open(os.path.join(output_folder, 'training_log.csv'), 'a') as fid:
@@ -135,18 +135,18 @@ def train_shapenet(dataset_folder,
         train_loss.append(np.mean(epoch_train_loss))
         test_loss.append(np.mean(epoch_test_loss))
         train_acc.append(np.mean(epoch_train_acc))
-        val_acc.append(np.mean(epoch_test_acc))
+        test_acc.append(np.mean(epoch_test_acc))
 
     fig = plt.figure()
-    plt.plot(epochs, train_loss, 'bo', label='Training loss')
-    plt.plot(epochs, test_loss, 'b', label='Test loss')
+    plt.plot(range(epochs), train_loss, 'bo', label='Training loss')
+    plt.plot(range(epochs), test_loss, 'b', label='Test loss')
     plt.title('Training and test loss')
     plt.legend()
     fig.savefig(os.path.join(output_folder, 'loss_plot.png'))
 
     fig = plt.figure()
-    plt.plot(epochs, train_acc, 'bo', label='Training accuracy')
-    plt.plot(epochs, val_acc, 'b', label='Test accuracy')
+    plt.plot(range(epochs), train_acc, 'bo', label='Training accuracy')
+    plt.plot(range(epochs), test_acc, 'b', label='Test accuracy')
     plt.title('Training and test accuracy')
     plt.legend()
     fig.savefig(os.path.join(output_folder, 'accuracy_plot.png'))
