@@ -89,9 +89,9 @@ class BasePointNet(nn.Module):
 
         if self.return_local_features:
             x = x.view(-1, 1024, 1).repeat(1, 1, num_points)
-            return torch.cat([x.transpose(2, 1), local_point_features], 2)
+            return torch.cat([x.transpose(2, 1), local_point_features], 2), feature_transform
         else:
-            return x
+            return x, feature_transform
 
 
 class ClassificationPointNet(nn.Module):
@@ -110,13 +110,13 @@ class ClassificationPointNet(nn.Module):
         self.dropout_1 = nn.Dropout(dropout)
 
     def forward(self, x):
-        x = self.base_pointnet(x)
+        x, feature_transform = self.base_pointnet(x)
 
         x = F.relu(self.bn_1(self.fc_1(x)))
         x = F.relu(self.bn_2(self.fc_2(x)))
         x = self.dropout_1(x)
 
-        return F.log_softmax(self.fc_3(x), dim=1)
+        return F.log_softmax(self.fc_3(x), dim=1), feature_transform
 
 
 class SegmentationPointNet(nn.Module):
@@ -135,7 +135,7 @@ class SegmentationPointNet(nn.Module):
         self.bn_3 = nn.BatchNorm1d(128)
 
     def forward(self, x):
-        x = self.base_pointnet(x)
+        x, feature_transform = self.base_pointnet(x)
 
         x = x.transpose(2, 1)
         x = F.relu(self.bn_1(self.conv_1(x)))
@@ -145,4 +145,4 @@ class SegmentationPointNet(nn.Module):
         x = self.conv_4(x)
         x = x.transpose(2, 1)
 
-        return F.log_softmax(x, dim=-1)
+        return F.log_softmax(x, dim=-1), feature_transform
