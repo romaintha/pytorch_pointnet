@@ -11,7 +11,8 @@ conda create --name pytorch_pointnet --file spec-file.txt
 ```
 
 ### Available datasets
-* shapenet: download the dataset [here](http://web.stanford.edu/~ericyi/project_page/part_annotation/index.html)
+* ```shapenet```: download the dataset 
+[here](http://web.stanford.edu/~ericyi/project_page/part_annotation/index.html).
 
 More soon
 
@@ -29,7 +30,7 @@ python train.py dataset dataset_folder task output_folder
 
 where:
 * ```dataset```: is one of the available datasets (e.g. ```shapenet```)
-* ```dataset_folder```: is the path to the roo dataset folder
+* ```dataset_folder```: is the path to the root dataset folder
 * ```task```: is either ```classification``` or ```segmentation```
 * ```output_folder```: is the output_folder path where the training logs and model 
 checkpoints will be stored
@@ -40,3 +41,18 @@ checkpoints will be stored
 * ```number_of_workers```: is the number of workers used by the data loader
 * ```model_checkpoint```: is the path to a checkpoint that is loaded 
 before the training begins.
+
+### Infer
+Use the following script for inference:
+```
+python infer.py dataset model_checkpoint point_cloud_file task 
+```
+
+where:
+* ```dataset```: is one of the available datasets (e.g. ```shapenet```)
+* ```model_checkpoint```: is the path to a checkpoint that is loaded 
+before the inference begins.
+* ```point_cloud_file```: is the path to the point cloud file to run the inference on.
+* ```task```: is either ```classification``` or ```segmentation```
+
+This will also output a 3d visualization of the point cloud.
