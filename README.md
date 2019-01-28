@@ -14,10 +14,15 @@ conda create --name pytorch_pointnet --file spec-file.txt
 * ```shapenet```: The dataset can be downloaded 
 [here](http://web.stanford.edu/~ericyi/project_page/part_annotation/index.html).
 For this dataset, classification and segmentation (part segmentation) tasks are available. 
-  * Classification:   
+  * Classification: [Pretrained model](assets/shapenet/classification/shapenet_classification_model.pth)
+    
     <img src="assets/shapenet/classification/loss_plot.png" width="320" height="240">
     <img src="assets/shapenet/classification/accuracy_plot.png"  width="320" height="240">
-    [Pretrained model](assets/shapenet/classification/shapenet_classification_model.pth)
+  * Segmentation: [Pretrained model](assets/shapenet/segmentation/shapenet_classification_model.pth)
+    
+    <img src="assets/shapenet/segmentation/loss_plot.png" width="320" height="240">
+    <img src="assets/shapenet/segmentation/accuracy_plot.png"  width="320" height="240">
+    TODO: change the metric to mIoU
 
 More soon
 
