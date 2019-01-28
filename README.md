@@ -11,8 +11,13 @@ conda create --name pytorch_pointnet --file spec-file.txt
 ```
 
 ### Available datasets
-* ```shapenet```: download the dataset 
+* ```shapenet```: The dataset can be downloaded 
 [here](http://web.stanford.edu/~ericyi/project_page/part_annotation/index.html).
+For this dataset, classification and segmentation (part segmentation) tasks are available. 
+  * Classification:   
+    * Loss: <img src="assets/shapenet/classification/loss_plot.png">
+    * Accuracy: <img src="assets/shapenet/classification/accuracy_plot.png">
+    * Pretrained model: [Model](assets/shapenet/classification/shapenet_classification_model.pth)
 
 More soon
 
