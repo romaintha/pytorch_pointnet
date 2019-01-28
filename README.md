@@ -15,11 +15,9 @@ conda create --name pytorch_pointnet --file spec-file.txt
 [here](http://web.stanford.edu/~ericyi/project_page/part_annotation/index.html).
 For this dataset, classification and segmentation (part segmentation) tasks are available. 
   * Classification:   
-    * Loss: 
-      <img src="assets/shapenet/classification/loss_plot.png" width="320" height="240">
-    * Accuracy: 
-      <img src="assets/shapenet/classification/accuracy_plot.png"  width="320" height="240">
-    * Pretrained model: [Model](assets/shapenet/classification/shapenet_classification_model.pth)
+    <img src="assets/shapenet/classification/loss_plot.png" width="320" height="240">
+    <img src="assets/shapenet/classification/accuracy_plot.png"  width="320" height="240">
+    [Pretrained model](assets/shapenet/classification/shapenet_classification_model.pth)
 
 More soon
 
