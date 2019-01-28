@@ -22,7 +22,8 @@ For this dataset, classification and segmentation (part segmentation) tasks are 
     
     <img src="assets/shapenet/segmentation/loss_plot.png" width="320" height="240">
     <img src="assets/shapenet/segmentation/accuracy_plot.png"  width="320" height="240">
-    TODO: change the metric to mIoU
+    
+    TODO: change the metric to mIoU for segmentation
 
 More soon
 
