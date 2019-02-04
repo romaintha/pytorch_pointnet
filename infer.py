@@ -8,7 +8,7 @@ import torch
 import open3d
 
 from model.pointnet import ClassificationPointNet, SegmentationPointNet
-from datasets import ShapeNetDataset
+from datasets import ShapeNetDataset, PointMNISTDataset
 
 MODELS = {
     'classification': ClassificationPointNet,
@@ -16,7 +16,8 @@ MODELS = {
 }
 
 DATASETS = {
-    'shapenet': ShapeNetDataset
+    'shapenet': ShapeNetDataset,
+    'mnist': PointMNISTDataset
 }
 
 
@@ -28,7 +29,8 @@ def infer(dataset,
         num_classes = DATASETS[dataset].NUM_CLASSIFICATION_CLASSES
     elif task == 'segmentation':
         num_classes = DATASETS[dataset].NUM_SEGMENTATION_CLASSES
-    model = MODELS[task](num_classes)
+    model = MODELS[task](num_classes=num_classes,
+                         point_dimension=DATASETS[dataset].POINT_DIMENSION)
     if torch.cuda.is_available():
         model.cuda()
     model.load_state_dict(torch.load(model_checkpoint))
@@ -48,7 +50,9 @@ def infer(dataset,
     preds = preds.cpu().numpy()
 
     if task == 'classification':
-        print('Detected class:')
+        print('Detected class: %s' % preds)
+        if points.shape[1] == 2:
+            points = np.hstack([points, np.zeros((49,1))])
         pcd = open3d.PointCloud()
         pcd.points = open3d.Vector3dVector(points)
         open3d.draw_geometries([pcd])
@@ -66,7 +70,7 @@ def infer(dataset,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('dataset', choices=['shapenet'], type=str, help='dataset to train on')
+    parser.add_argument('dataset', choices=['shapenet', 'mnist'], type=str, help='dataset to train on')
     parser.add_argument('model_checkpoint', type=str, help='dataset to train on')
     parser.add_argument('point_cloud_file', type=str, help='path to the point cloud file')
     parser.add_argument('task', type=str, choices=['classification', 'segmentation'], help='type of task')

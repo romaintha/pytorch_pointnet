@@ -9,7 +9,7 @@ import numpy as np
 
 from fastprogress import master_bar, progress_bar
 
-from datasets import ShapeNetDataset, PointMNIST
+from datasets import ShapeNetDataset, PointMNISTDataset
 from model.pointnet import ClassificationPointNet, SegmentationPointNet
 from utils import plot_losses, plot_accuracies
 
@@ -21,7 +21,7 @@ MODELS = {
 
 DATASETS = {
     'shapenet': ShapeNetDataset,
-    'mnist': PointMNIST
+    'mnist': PointMNISTDataset
 }
 
 

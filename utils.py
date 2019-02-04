@@ -7,7 +7,7 @@ def transform_2d_img_to_point_cloud(img):
     indices = np.argwhere(img_array > 127)
     for i in range(2):
         indices[i] = (indices[i] - img_array.shape[i]/2)/ img_array.shape[i]
-    return indices
+    return indices.astype(np.float32)
 
 
 def plot_losses(train_loss, test_loss, save_to_file=None):
@@ -19,6 +19,7 @@ def plot_losses(train_loss, test_loss, save_to_file=None):
     plt.legend()
     if save_to_file:
         fig.savefig()
+
 
 def plot_accuracies(train_acc, test_acc, save_to_file=None):
     fig = plt.figure()
