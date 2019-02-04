@@ -46,13 +46,13 @@ class TransformationNet(nn.Module):
 
 class BasePointNet(nn.Module):
 
-    def __init__(self, return_local_features=False):
+    def __init__(self, point_dimension, return_local_features=False):
         super(BasePointNet, self).__init__()
         self.return_local_features = return_local_features
-        self.input_transform = TransformationNet(input_dim=3, output_dim=3)
+        self.input_transform = TransformationNet(input_dim=point_dimension, output_dim=point_dimension)
         self.feature_transform = TransformationNet(input_dim=64, output_dim=64)
 
-        self.conv_1 = nn.Conv1d(3, 64, 1)
+        self.conv_1 = nn.Conv1d(point_dimension, 64, 1)
         self.conv_2 = nn.Conv1d(64, 64, 1)
         self.conv_3 = nn.Conv1d(64, 64, 1)
         self.conv_4 = nn.Conv1d(64, 128, 1)
@@ -96,9 +96,9 @@ class BasePointNet(nn.Module):
 
 class ClassificationPointNet(nn.Module):
 
-    def __init__(self, num_classes, dropout=0.3):
+    def __init__(self, num_classes, dropout=0.3, point_dimension=3):
         super(ClassificationPointNet, self).__init__()
-        self.base_pointnet = BasePointNet(return_local_features=False)
+        self.base_pointnet = BasePointNet(return_local_features=False, point_dimension=point_dimension)
 
         self.fc_1 = nn.Linear(1024, 512)
         self.fc_2 = nn.Linear(512, 256)
@@ -121,9 +121,9 @@ class ClassificationPointNet(nn.Module):
 
 class SegmentationPointNet(nn.Module):
 
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, point_dimension=3):
         super(SegmentationPointNet, self).__init__()
-        self.base_pointnet = BasePointNet(return_local_features=True)
+        self.base_pointnet = BasePointNet(return_local_features=True, point_dimension=point_dimension)
 
         self.conv_1 = nn.Conv1d(1088, 512, 1)
         self.conv_2 = nn.Conv1d(512, 256, 1)

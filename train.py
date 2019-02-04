@@ -7,12 +7,12 @@ import torch.nn.functional as F
 
 import numpy as np
 
-import matplotlib.pyplot as plt
-
 from fastprogress import master_bar, progress_bar
 
-from datasets import ShapeNetDataset
+from datasets import ShapeNetDataset, PointMNIST
 from model.pointnet import ClassificationPointNet, SegmentationPointNet
+from utils import plot_losses, plot_accuracies
+
 
 MODELS = {
     'classification': ClassificationPointNet,
@@ -20,7 +20,8 @@ MODELS = {
 }
 
 DATASETS = {
-    'shapenet': ShapeNetDataset
+    'shapenet': ShapeNetDataset,
+    'mnist': PointMNIST
 }
 
 
@@ -43,7 +44,7 @@ def train(dataset,
                                                    num_workers=number_of_workers)
     test_dataset = DATASETS[dataset](dataset_folder,
                                      task=task,
-                                     is_training=False,
+                                     train=False,
                                      number_of_points=number_of_points)
     test_dataloader = torch.utils.data.DataLoader(test_dataset,
                                                   batch_size=batch_size,
@@ -51,9 +52,11 @@ def train(dataset,
                                                   num_workers=number_of_workers)
 
     if task == 'classification':
-        model = ClassificationPointNet(num_classes=train_dataset.NUM_CLASSIFICATION_CLASSES)
+        model = ClassificationPointNet(num_classes=train_dataset.NUM_CLASSIFICATION_CLASSES,
+                                       point_dimension=train_dataset.POINT_DIMENSION)
     elif task == 'segmentation':
-        model = SegmentationPointNet(num_classes=train_dataset.NUM_SEGMENTATION_CLASSES)
+        model = SegmentationPointNet(num_classes=train_dataset.NUM_SEGMENTATION_CLASSES,
+                                     point_dimension=train_dataset.POINT_DIMENSION)
     else:
         raise Exception('Unknown task !')
 
@@ -83,9 +86,6 @@ def train(dataset,
         for data in progress_bar(train_dataloader, parent=mb):
             batch_number += 1
             points, targets = data
-
-            if task == 'classification':
-                targets = targets[:, 0]
             if torch.cuda.is_available():
                 points, targets = points.cuda(), targets.cuda()
             if points.shape[0] <= 1:
@@ -103,7 +103,7 @@ def train(dataset,
             regularization_loss = torch.norm(
                 identity - torch.bmm(feature_transform, feature_transform.transpose(2, 1))
             )
-            loss = F.nll_loss(preds, targets) + regularization_loss
+            loss = F.nll_loss(preds, targets) + 0.001 * regularization_loss
             epoch_train_loss.append(loss.cpu().item())
             loss.backward()
             optimizer.step()
@@ -120,8 +120,6 @@ def train(dataset,
         epoch_test_acc = []
         for batch_number, data in enumerate(test_dataloader):
             points, targets = data
-            if task == 'classification':
-                targets = targets[:, 0]
             if torch.cuda.is_available():
                 points, targets = points.cuda(), targets.cuda()
             model = model.eval()
@@ -159,24 +157,13 @@ def train(dataset,
         train_acc.append(np.mean(epoch_train_acc))
         test_acc.append(np.mean(epoch_test_acc))
 
-    fig = plt.figure()
-    plt.plot(range(epochs), train_loss, 'bo', label='Training loss')
-    plt.plot(range(epochs), test_loss, 'b', label='Test loss')
-    plt.title('Training and test loss')
-    plt.legend()
-    fig.savefig(os.path.join(output_folder, 'loss_plot.png'))
-
-    fig = plt.figure()
-    plt.plot(range(epochs), train_acc, 'bo', label='Training accuracy')
-    plt.plot(range(epochs), test_acc, 'b', label='Test accuracy')
-    plt.title('Training and test accuracy')
-    plt.legend()
-    fig.savefig(os.path.join(output_folder, 'accuracy_plot.png'))
+    plot_losses(train_loss, test_loss, save_to_file=os.path.join(output_folder, 'loss_plot.png'))
+    plot_accuracies(train_acc, test_acc, save_to_file=os.path.join(output_folder, 'accuracy_plot.png'))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('dataset', type=str, choices=['shapenet'], help='dataset to train on')
+    parser.add_argument('dataset', type=str, choices=['shapenet', 'mnist'], help='dataset to train on')
     parser.add_argument('dataset_folder', type=str, help='path to the dataset folder')
     parser.add_argument('task', type=str, choices=['classification', 'segmentation'], help='type of task')
     parser.add_argument('output_folder', type=str, help='output folder')

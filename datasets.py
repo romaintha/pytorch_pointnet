@@ -3,13 +3,18 @@ import os
 import csv
 import torch.utils.data as data
 import torch
+from torchvision.datasets import MNIST
 
 import numpy as np
+
+from utils import transform_2d_img_to_point_cloud
 
 
 class ShapeNetDataset(data.Dataset):
     NUM_CLASSIFICATION_CLASSES = 16
     NUM_SEGMENTATION_CLASSES = 50
+
+    POINT_DIMENSION = 3
 
     PER_CLASS_NUM_SEGMENTATION_CLASSES = {
         'Airplane': 4,
@@ -34,12 +39,12 @@ class ShapeNetDataset(data.Dataset):
                  dataset_folder,
                  number_of_points=2500,
                  task='classification',
-                 is_training=True):
+                 train=True):
         self.dataset_folder = dataset_folder
         self.number_of_points = number_of_points
         assert task in ['classification', 'segmentation']
         self.task = task
-        self.is_training = is_training
+        self.train = train
 
         category_file = os.path.join(self.dataset_folder, 'synsetoffset2category.txt')
         self.folders_to_classes_mapping = {}
@@ -53,7 +58,7 @@ class ShapeNetDataset(data.Dataset):
                 self.segmentation_classes_offset[row[1]] = offset_seg_class
                 offset_seg_class += self.PER_CLASS_NUM_SEGMENTATION_CLASSES[row[0]]
 
-        if is_training:
+        if self.train:
             filelist = os.path.join(self.dataset_folder, 'train_test_split', 'shuffled_train_file_list.json')
         else:
             filelist = os.path.join(self.dataset_folder, 'train_test_split', 'shuffled_test_file_list.json')
@@ -107,7 +112,28 @@ class ShapeNetDataset(data.Dataset):
             segmentation_classes = torch.from_numpy(segmentation_classes)
             return point_cloud, segmentation_classes
         elif point_cloud_class is not None:
-            point_cloud_class = torch.tensor([point_cloud_class])
+            point_cloud_class = torch.tensor(point_cloud_class)
             return point_cloud, point_cloud_class
         else:
             return point_cloud
+
+
+class PointMNIST(MNIST):
+
+    NUM_CLASSIFICATION_CLASSES = 10
+
+    POINT_DIMENSION = 2
+
+    def __init__(self, *args, **kwargs):
+        kwargs.pop('task')
+        self.number_of_points = kwargs.pop('number_of_points')
+        kwargs['download'] = True
+        super(PointMNIST, self).__init__(*args, **kwargs)
+        self.transform = transform_2d_img_to_point_cloud
+
+    def __getitem__(self, index):
+        img, target = super(PointMNIST, self).__getitem__(index)
+        sampling_indices = np.random.choice(img.shape[0], self.number_of_points)
+        img = img[sampling_indices, :].astype(np.float32)
+        img = torch.tensor(img)
+        return img, target

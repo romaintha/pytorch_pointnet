@@ -24,9 +24,13 @@ For this dataset, classification and segmentation (part segmentation) tasks are 
     <img src="assets/shapenet/segmentation/accuracy_plot.png"  width="320" height="240">
     
     TODO: change the metric to mIoU for segmentation
-
-More soon
-
+* ```mnist```: If not found, the dataset will be downloaded automatically. 
+Only the classification task is avialable.
+  * Classification: with only 50 points per cloud, [Pretrained model](assets/shapenet/classification/shapenet_classification_model.pth)
+    
+    <img src="assets/mnist/classification/loss_plot.png" width="320" height="240">
+    <img src="assets/mnist/classification/accuracy_plot.png"  width="320" height="240">
+    
 ### Training
 Use the following script for training
 ```
